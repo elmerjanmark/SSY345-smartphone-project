@@ -1,0 +1,17 @@
+
+clear;
+startup();
+
+%%
+[xhat, meas] = filterTemplate();
+%% 
+
+acc_mean = mean(meas.acc(:, ~any(isnan(meas.acc), 1)), 2);
+gyro_mean = mean(meas.gyr(:, ~any(isnan(meas.gyr), 1)), 2);
+mag_mean = mean(meas.mag(:, ~any(isnan(meas.mag), 1)), 2);
+
+acc_var = var(meas.acc(:, ~any(isnan(meas.acc), 1)),0, 2);
+gyro_var = var(meas.gyr(:, ~any(isnan(meas.gyr), 1)),0, 2);
+mag_var = var(meas.mag(:, ~any(isnan(meas.mag), 1)),0, 2);
+
+ploting(meas)
