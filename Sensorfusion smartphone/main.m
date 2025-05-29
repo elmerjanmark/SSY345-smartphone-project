@@ -14,4 +14,5 @@ acc_var = var(meas.acc(:, ~any(isnan(meas.acc), 1)),0, 2);
 gyro_var = var(meas.gyr(:, ~any(isnan(meas.gyr), 1)),0, 2);
 mag_var = var(meas.mag(:, ~any(isnan(meas.mag), 1)),0, 2);
 
-ploting(meas)
+ploting(meas, [acc_mean, gyro_mean, mag_mean], [acc_var, gyro_var, mag_var])
+
