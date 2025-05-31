@@ -56,6 +56,7 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
     ownView = OrientationView('Own filter', gca);  % Used for visualization.
     googleView = [];
     counter = 0;  % Used to throttle the displayed frame rate.
+    t_old = 0;
 
     %% Filter loop
     while server.status()  % Repeat while data is available
@@ -75,14 +76,15 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       acc = data(1, 2:4)';
       if ~any(isnan(acc))  % Acc measurements are available.
-        % Do something
+          [x,P] = mu_g(x, P, acc, calAcc.R, calAcc.g0);
       end
       gyr = data(1, 5:7)';
-      T = 0.01;
       if ~any(isnan(gyr))  % Gyro measurements are available.
-        [x, P] = tu_qw(x, P, gyr, T, calGyr.R);
+        dt = t - t_old;
+        [x, P] = tu_qw(x, P, gyr, dt, calGyr.R);
+        t_old = t;
       else
-        [x, P] = tu_qw_no(x,P, calGyr.R);
+        [x, P] = tu_qw_no(x,P, 0.01, calGyr.R);
       end
 
       mag = data(1, 8:10)';

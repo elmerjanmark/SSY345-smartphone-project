@@ -35,6 +35,7 @@ calAcc.g0 = g0;
 
 %%
 
+
 [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag);
 
 
