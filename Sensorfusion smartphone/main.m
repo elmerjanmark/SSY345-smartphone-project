@@ -18,7 +18,7 @@ mag_var = var(meas.mag(:, ~any(isnan(meas.mag), 1)),0, 2);
 
 %%
 
-ploting(meas, [acc_mean, gyro_mean, mag_mean], [acc_var, gyro_var, mag_var])
+ploting(meas, [acc_mean, gyro_mean, mag_mean], [acc_var, gyro_var, mag_var]);
 
 %% Calibrated
 calAcc = struct('m', acc_mean, 'R', diag(acc_var));
@@ -27,15 +27,19 @@ calMag = struct('m', mag_mean, 'R', diag(mag_var));
 
 
 %% calibrate g0
-load("g0_cal.mat")
+%load("g0_cal.mat")
 
-g0 = mean(meas.acc(:, ~any(isnan(meas.acc), 1)), 2);
+g0 = calAcc.m;
 
 calAcc.g0 = g0;
 
 %%
 
+m0 = [0; sqrt(calMag.m(1)^2 + calMag.m(2)^2); calMag.m(3)];
+calMag.m0 = m0;
 
-[xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag);
+%%
+
+[xhats, meass] = filterTemplate_C(calAcc, calGyr, calMag);
 
 

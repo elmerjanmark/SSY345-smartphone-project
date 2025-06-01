@@ -76,12 +76,8 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       acc = data(1, 2:4)';
       if ~any(isnan(acc))  % Acc measurements are available.
-          if (abs(calAcc.g0(3) - acc(3))<= 1)
-            [x,P] = mu_g(x, P, acc, calAcc.R, calAcc.g0);
-            ownView.setAccDist(0);
-          else
-              ownView.setAccDist(1);
-          end
+          if (abs(calAcc.g0 - [0;0; 9.81])<= 1e-5) 
+          [x,P] = mu_g(x, P, acc, calAcc.R, calAcc.g0);
       end
       gyr = data(1, 5:7)';
       if ~any(isnan(gyr))  % Gyro measurements are available.
@@ -94,7 +90,7 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       mag = data(1, 8:10)';
       if ~any(isnan(mag))  % Mag measurements are available.
-        [x,P] = mu_m(x, P, mag, calmag.R, calmag.m0);
+        % Do something
       end
 
       orientation = data(1, 18:21)';  % Google's orientation estimate.
