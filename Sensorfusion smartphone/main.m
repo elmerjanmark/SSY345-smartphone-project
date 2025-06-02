@@ -9,6 +9,12 @@ startup();
 %load("data.mat")
 %load("data_ute.mat")
 
+meas.acc = meas.acc(:,1:3500);
+meas.gyr = meas.gyr(:,1:3500);
+meas.mag = meas.mag(:,1:3500);
+meas.t = meas.t(:,1:3500);
+meas.orient = meas.orient(:,1:3500);
+
 
 acc_mean = mean(meas.acc(:, ~any(isnan(meas.acc), 1)), 2);
 gyro_mean = mean(meas.gyr(:, ~any(isnan(meas.gyr), 1)), 2);
@@ -48,22 +54,34 @@ calMag.m0 = m0;
 
 eu_filter = q2euler(xhats.x);
 eu_orient = q2euler(meass.orient);
-%%
-figure; hold on; grid on;
-plot(xhats.t,eu_filter(1,:));
-plot(meass.t,eu_orient(1,:));
-legend('Roll own', 'Roll google')
-xlabel('time')
-ylabel('Angle')
-figure; hold on; grid on;
-plot(xhats.t,eu_filter(2,:));
-plot(meass.t,eu_orient(2,:));
-legend('Pitch own', 'Pitch google')
-xlabel('time')
-ylabel('Angle')
-figure; hold on; grid on;
-plot(xhats.t,eu_filter(3,:));
-plot(meass.t,eu_orient(3,:));
-legend('Yaw own', 'Yaw google')
-xlabel('time')
-ylabel('Angle')
+
+figure;
+
+% Roll
+subplot(3,1,1); hold on; grid on;
+plot(xhats.t, eu_filter(1,:), 'b');
+plot(meass.t, eu_orient(1,:), 'r');
+legend('z own', 'z google');
+ylabel('Angle (°)');
+title('Z');
+% xlim([0 40]);
+
+% Pitch
+subplot(3,1,2); hold on; grid on;
+plot(xhats.t, eu_filter(2,:), 'b');
+plot(meass.t, eu_orient(2,:), 'r');
+legend('y own', 'y google');
+ylabel('Angle (°)');
+title('y');
+% xlim([0 40]);
+
+% Yaw
+subplot(3,1,3); hold on; grid on;
+plot(xhats.t, eu_filter(3,:), 'b');
+plot(meass.t, eu_orient(3,:), 'r');
+legend('x own', 'x google');
+xlabel('Time (s)');
+ylabel('Angle (°)');
+title('x');
+% xlim([0 40]);
+
