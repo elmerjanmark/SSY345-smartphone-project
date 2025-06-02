@@ -57,7 +57,9 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
     googleView = [];
     counter = 0;  % Used to throttle the displayed frame rate.
     t_old = 0;
-
+    alpha = 0.1;
+    L = norm(calMag.m0);
+    
     %% Filter loop
     while server.status()  % Repeat while data is available
       % Get the next measurement set, assume all measurements
@@ -76,7 +78,7 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       acc = data(1, 2:4)';
       if ~any(isnan(acc))  % Acc measurements are available.
-          if (abs(calAcc.g0(3) - acc(3))<= 1)
+          if (abs(norm(calAcc.g0) - norm(acc))<= 1)
             [x,P] = mu_g(x, P, acc, calAcc.R, calAcc.g0);
             ownView.setAccDist(0);
           else
@@ -94,10 +96,19 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       mag = data(1, 8:10)';
       if ~any(isnan(mag))  % Mag measurements are available.
-        [x,P] = mu_m(x, P, mag, calmag.R, calmag.m0);
+        L = (1-alpha)*L + alpha*norm(mag);
+        if abs(norm(mag)-L) <= 3
+            [x,P] = mu_m(x, P, mag, calMag.m0, calMag.R);
+            ownView.setMagDist(0);
+        else
+            ownView.setMagDist(1);
+        end
+
       end
 
       orientation = data(1, 18:21)';  % Google's orientation estimate.
+      
+      % plot euler angles 
 
       % Visualize result
       if rem(counter, 10) == 0
@@ -125,7 +136,9 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
       meas.gyr(:, end+1) = gyr;
       meas.mag(:, end+1) = mag;
       meas.orient(:, end+1) = orientation;
+
     end
+    
   % catch e
   %   fprintf(['Unsuccessful connecting to client!\n' ...
   %     'Make sure to start streaming from the phone *after*'...

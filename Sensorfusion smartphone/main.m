@@ -6,7 +6,9 @@ startup();
 [xhat, meas] = filterTemplate();
 %% 
 
-load("data.mat")
+%load("data.mat")
+%load("data_ute.mat")
+
 
 acc_mean = mean(meas.acc(:, ~any(isnan(meas.acc), 1)), 2);
 gyro_mean = mean(meas.gyr(:, ~any(isnan(meas.gyr), 1)), 2);
@@ -42,4 +44,26 @@ calMag.m0 = m0;
 
 [xhats, meass] = filterTemplate_C(calAcc, calGyr, calMag);
 
+%% 
 
+eu_filter = q2euler(xhats.x);
+eu_orient = q2euler(meass.orient);
+%%
+figure; hold on; grid on;
+plot(xhats.t,eu_filter(1,:));
+plot(meass.t,eu_orient(1,:));
+legend('Roll own', 'Roll google')
+xlabel('time')
+ylabel('Angle')
+figure; hold on; grid on;
+plot(xhats.t,eu_filter(2,:));
+plot(meass.t,eu_orient(2,:));
+legend('Pitch own', 'Pitch google')
+xlabel('time')
+ylabel('Angle')
+figure; hold on; grid on;
+plot(xhats.t,eu_filter(3,:));
+plot(meass.t,eu_orient(3,:));
+legend('Yaw own', 'Yaw google')
+xlabel('time')
+ylabel('Angle')
