@@ -107,6 +107,8 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
       end
 
       orientation = data(1, 18:21)';  % Google's orientation estimate.
+      
+      % plot euler angles 
 
       % Visualize result
       if rem(counter, 10) == 0
@@ -134,7 +136,9 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
       meas.gyr(:, end+1) = gyr;
       meas.mag(:, end+1) = mag;
       meas.orient(:, end+1) = orientation;
+
     end
+    
   % catch e
   %   fprintf(['Unsuccessful connecting to client!\n' ...
   %     'Make sure to start streaming from the phone *after*'...
