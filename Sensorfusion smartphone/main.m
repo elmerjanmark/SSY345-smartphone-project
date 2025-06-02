@@ -6,7 +6,9 @@ startup();
 [xhat, meas] = filterTemplate();
 %% 
 
-load("data.mat")
+%load("data.mat")
+%load("data_ute.mat")
+
 
 acc_mean = mean(meas.acc(:, ~any(isnan(meas.acc), 1)), 2);
 gyro_mean = mean(meas.gyr(:, ~any(isnan(meas.gyr), 1)), 2);

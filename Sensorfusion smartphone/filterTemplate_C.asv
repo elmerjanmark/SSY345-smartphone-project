@@ -57,7 +57,9 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
     googleView = [];
     counter = 0;  % Used to throttle the displayed frame rate.
     t_old = 0;
-
+    alpha = 0.1;
+    L = alpha*norm(calMag.m0);
+    
     %% Filter loop
     while server.status()  % Repeat while data is available
       % Get the next measurement set, assume all measurements
@@ -76,8 +78,12 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       acc = data(1, 2:4)';
       if ~any(isnan(acc))  % Acc measurements are available.
-          if (abs(calAcc.g0 - [0;0; 9.81])<= 1e-5) 
-          [x,P] = mu_g(x, P, acc, calAcc.R, calAcc.g0);
+          if (abs(norm(calAcc.g0) - norm(acc))<= 1)
+            [x,P] = mu_g(x, P, acc, calAcc.R, calAcc.g0);
+            ownView.setAccDist(0);
+          else
+              ownView.setAccDist(1);
+          end
       end
       gyr = data(1, 5:7)';
       if ~any(isnan(gyr))  % Gyro measurements are available.
@@ -90,7 +96,9 @@ function [xhat, meas] = filterTemplate_C(calAcc, calGyr, calMag)
 
       mag = data(1, 8:10)';
       if ~any(isnan(mag))  % Mag measurements are available.
-        % Do something
+        L = (1-alpha)*L + alpha*norm(mag);
+        if 
+            [x,P] = mu_m(x, P, mag, calMag.m0, calMag.R);
       end
 
       orientation = data(1, 18:21)';  % Google's orientation estimate.
